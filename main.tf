@@ -84,8 +84,8 @@ resource "aws_instance" "main" {
 
   # Minikube 설정
   sudo -u ubuntu -i << 'EOT'
-  # nohup minikube start --driver=docker > /dev/null 2>&1 &
-  nohup minikube start --driver=none > /dev/null 2>&1 &
+  nohup minikube start --driver=docker > /dev/null 2>&1 &
+  # nohup minikube start --driver=none > /dev/null 2>&1 &
   while ! minikube status > /dev/null 2>&1; do
     sleep 30
     echo "Waiting for Minikube to start..."
@@ -115,13 +115,13 @@ resource "aws_instance" "main" {
   # Helm Install
   curl -s https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
-  # # iptables rule 추가
-  # sudo apt-get install netfilter-persistent -y
-  # sudo systemctl enable netfilter-persistent --now
-  # sudo iptables -t nat -A PREROUTING -p tcp --dport 30000:32767 -j DNAT --to-destination 192.168.49.2:30000-32767
-  # sudo iptables -t nat -A POSTROUTING -p tcp --dport 30000:32767 -j MASQUERADE
-  # sudo iptables -I DOCKER -p tcp -d 192.168.49.2 --dport 30000:32767 -j ACCEPT
-  # sudo netfilter-persistent save
+  # iptables rule 추가
+  sudo apt-get install netfilter-persistent -y
+  sudo systemctl enable netfilter-persistent --now
+  sudo iptables -t nat -A PREROUTING -p tcp --dport 30000:32767 -j DNAT --to-destination 192.168.49.2:30000-32767
+  sudo iptables -t nat -A POSTROUTING -p tcp --dport 30000:32767 -j MASQUERADE
+  sudo iptables -I DOCKER -p tcp -d 192.168.49.2 --dport 30000:32767 -j ACCEPT
+  sudo netfilter-persistent save
 
   EOF
 
